@@ -70,7 +70,8 @@ def print_pde(w, rhs_description, ut = 'u_t', print_imag=False):
     """Prints the pde string"""
     print(pde_string(w, rhs_description, ut, print_imag=False))
 
-def find_pareto_front(obj1, obj2, order_axis=1, plot_fig=True, file_name='pareto_front.pdf'):
+def find_pareto_front(obj1, obj2, order_axis=1, plot_fig=True, \
+        xlabel='Log(loss)', ylabel='Complexity', file_name='pareto_front.pdf'):
     """
     Plots the Pareto front between values the lists of obj1 and obj2
     INPUT:
@@ -78,6 +79,7 @@ def find_pareto_front(obj1, obj2, order_axis=1, plot_fig=True, file_name='pareto
     order_axis: which axis to to use for order the indices
     plot_fig: True or False to make a figure
     pareto_file: location for saving the figure
+    xlabel, ylabel: labels for the axes
     Returns:
     inds of the pareto front sorted according to the order_axis
     """
@@ -98,12 +100,12 @@ def find_pareto_front(obj1, obj2, order_axis=1, plot_fig=True, file_name='pareto
         plt.subplot(121)
         plt.scatter(obj1, obj2, 10, color='k')
         plt.title('All the solutions', fontsize=10)
-        plt.xlabel('Log(Loss)'); plt.ylabel('Complexity')
+        plt.xlabel(xlabel); plt.ylabel(ylabel)
 
         plt.subplot(122)
         plt.scatter(pareto_obj1, pareto_obj2, 10, color='k')
         plt.title('Pareto Front')
-        plt.xlabel('Log(Loss)'); plt.ylabel('Complexity')
+        plt.xlabel(xlabel); plt.ylabel(ylabel)
 
         plt.tight_layout()
         plt.savefig(file_name)
