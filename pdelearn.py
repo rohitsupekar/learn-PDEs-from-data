@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class PDElearn:
 
     def __init__(self, f_desc, ft_desc, features, data_raw, poly_order=0, sparse_algo='stridge', \
-                    print_flag=False):
+                    print_flag=False, path='./'):
         """
         f, ft: string descriptors of the field variable
         features: list with string descriptors of all the features
@@ -27,12 +27,14 @@ class PDElearn:
         poly_order: largest order of f to construct the feature matrix
         sparse_algo: which sparsity promoting algo to use
             currently implemented 'STRidge', 'IHTd'
+        path: various text/pdf files will be saved at path + qualifier . extension
         """
         self.ft_desc = ft_desc
         self.f_desc= f_desc
         self.features = features
         self.P = poly_order
         self.print_flag = print_flag
+        self.path = path
 
         if sparse_algo.lower() not in ['stridge', 'ihtd']:
             self.sparse_algo = 'stridge' #default
@@ -184,7 +186,7 @@ class PDElearn:
         maxit: max iterations for the solver
         """
 
-        if self.sparse_algo is not "stridge" and len(lam2_arr) != 1:
+        if self.sparse_algo != 'stridge' and len(lam2_arr) != 1:
             logger.error('Since solver is not STRidge, size of lambda2 array must be 1! Exiting..')
             return
 
@@ -247,8 +249,7 @@ class PDElearn:
 
         return self.coeffs_folds, self.error_folds
 
-    def find_intersection_of_folds(self, thresh=0.8, plot_hist=False, \
-        file_name = 'intersection.pdf'):
+    def find_intersection_of_folds(self, thresh=0.8, plot_hist=False):
         """
         Finds the intersection of the PDEs from multiple folds using Python sets.
         Each PDE is represented by a tuple like (0, 1, 1, ...., 0) where
@@ -293,8 +294,8 @@ class PDElearn:
             plt.bar(np.arange(1,len(score_all)+1), np.sort(score_all)[::-1])
             plt.plot([1, len(score_all)+1], [thresh, thresh], 'r--')
             plt.xlabel('PDE #'); plt.ylabel('Score');
-            plt.tight_layout(); plt.savefig(file_name);
-            logger.info('Score plot saved at %s' %(file_name))
+            plt.tight_layout(); plt.savefig(self.path + 'scores.pdf');
+            logger.info('Score plot saved at %s' %(self.path + 'scores.pdf'))
 
         #get the coeffs and the errors
         coeffs_all, error_all, num_terms_all, complexity_all = [], [], [], []
@@ -313,7 +314,9 @@ class PDElearn:
             #refit coefficients to full data
             NonZeroInds = np.nonzero(np.array(tup))[0]
             coeffs_new = np.zeros((d,1))
-            coeffs_new[NonZeroInds] = np.linalg.lstsq(self.Theta[:, NonZeroInds], self.ft, rcond=None)[0]
+            #refit coefficients only if some are non-zero
+            if len(NonZeroInds) != 0:
+                coeffs_new[NonZeroInds] = np.linalg.lstsq(self.Theta[:, NonZeroInds], self.ft, rcond=None)[0]
 
             num_terms = np.sum(np.array(tup))
             complexity = np.sum(self.W @ (np.array(tup)[:, np.newaxis]))
@@ -332,8 +335,7 @@ class PDElearn:
 
         return coeffs_all, error_all, score_all, num_terms_all, complexity_all
 
-    def select_stable_components(self, thresh=0.8, plot_stab=False, \
-        file_name = 'stability.pdf'):
+    def select_stable_components(self, thresh=0.8, plot_stab=False):
         """
         This function calculates the stability score for each term in the dictionary
         for every value of the hyperparamters lambda and tau.
@@ -374,7 +376,7 @@ class PDElearn:
             plt.ylabel('Stability Score')
             plt.tight_layout()
             plt.show()
-            plt.savefig(file_name)
+            plt.savefig(self.path + 'stability_path.pdf')
 
         #find all the unique PDEs
         tup_sets = set()
@@ -428,7 +430,7 @@ class PDElearn:
         self.coeffs_actual = coeffs_actual
         return coeffs_actual
 
-    def find_pareto(self, plot_fig=False, file_name='pareto_front.pdf'):
+    def find_pareto(self, plot_fig=False):
         """
         Find the Pareto Front of the intersection set
         """
@@ -437,17 +439,18 @@ class PDElearn:
             return
 
         #find the pareto front
-        ParetoInds = find_pareto_front(self.errors, self.complexity, \
-                        plot_fig=plot_fig, file_name=file_name)
+        ParetoInds = find_pareto_front(np.log10(self.errors), self.complexity, \
+                        plot_fig=plot_fig, file_name=self.path + 'pareto.pdf', \
+                        xlabel='Log(loss)', ylabel='Complexity')
         self.pareto_coeffs = [self.coeffs[i] for i in ParetoInds]
         self.pareto_errors = [self.errors[i] for i in ParetoInds]
         self.pareto_scores = [self.scores[i] for i in ParetoInds]
 
-    def print_pdes(self, coeffs, error, file_name='pdes.txt', **kwargs):
+    def print_pdes(self, coeffs, error, **kwargs):
         """ Print PDEs corresponding to the list of coeffs and the error
         kwargs: gets in the addtional values to be added to the text file
         """
-
+        file_name = self.path + 'pdes.txt'
         with open(file_name, "w") as text_file:
             for i, arr in enumerate(coeffs):
                 print('Log(loss) = %0.6f' %(np.log10(error[i])), file=text_file)
