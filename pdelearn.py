@@ -113,7 +113,7 @@ class PDElearn:
 
         return Theta, Theta_desc
 
-    def WeightMatrix(self, weightFac=0, w_list=None):
+    def create_weight_matrix(self, weightFac=0, w_list=None):
         """ Makes the weights matrix W"""
         #set base weights if w_list is unspecified
         if w_list is None:
@@ -160,7 +160,7 @@ class PDElearn:
         else:
             w_list = None
 
-        W = self.WeightMatrix(w_list=w_list)
+        W = self.create_weight_matrix(w_list=w_list)
 
         if self.sparse_algo == 'stridge':
             find_sparse_coeffs = lambda X, y, lam1, lam2, maxit: \
@@ -390,8 +390,10 @@ class PDElearn:
         for tup in tup_sets:
             #find the new coeffs on full data
             coeffs = np.zeros((n_coeffs, 1))
-            inds = np.nonzero(np.array(tup))[0]
-            coeffs[inds] = np.linalg.lstsq(self.Theta[:, inds], self.ft, rcond=None)[0]
+            NonZeroInds = np.nonzero(np.array(tup))[0]
+            #refit coefficients only if some are non-zero
+            if len(NonZeroInds) != 0:
+                coeffs[NonZeroInds] = np.linalg.lstsq(self.Theta[:, NonZeroInds], self.ft, rcond=None)[0]
             sq_error = find_error(self.Theta, self.ft, coeffs)
 
             num_terms = np.sum(np.array(tup))
