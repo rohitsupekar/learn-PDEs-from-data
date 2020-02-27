@@ -375,7 +375,6 @@ class PDElearn:
             plt.title('Stability Path'); plt.xlabel('$-\log(\lambda)$');
             plt.ylabel('Stability Score')
             plt.tight_layout()
-            plt.show()
             plt.savefig(self.path + 'stability_path.pdf')
 
         #find all the unique PDEs
@@ -448,11 +447,11 @@ class PDElearn:
         self.pareto_errors = [self.errors[i] for i in ParetoInds]
         self.pareto_scores = [self.scores[i] for i in ParetoInds]
 
-    def print_pdes(self, coeffs, error, **kwargs):
+    def print_pdes(self, coeffs, error, file_name_end='', **kwargs):
         """ Print PDEs corresponding to the list of coeffs and the error
         kwargs: gets in the addtional values to be added to the text file
         """
-        file_name = self.path + 'pdes.txt'
+        file_name = self.path + 'pdes_' + file_name_end + '.txt'
         with open(file_name, "w") as text_file:
             for i, arr in enumerate(coeffs):
                 print('Log(loss) = %0.6f' %(np.log10(error[i])), file=text_file)
