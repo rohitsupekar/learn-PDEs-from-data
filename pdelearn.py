@@ -310,6 +310,10 @@ class PDElearn:
 
         for i, (tup, score) in enumerate(zip(tup_sets_all, score_all)):
 
+            #skip if the tuple is empty
+            if tup == set():
+                continue
+
             #find the average test error
             error_new = np.mean([error_dict[k][tup] \
                     for k in range(n_folds) if tup in tup_sets[k]], axis=0)
@@ -379,20 +383,28 @@ class PDElearn:
                 plt.figure(figsize=(5,3), dpi=200)
                 for i in range(n_coeffs):
                     plt.plot(-np.log10(self.lam1_arr), stability[i,j*nlam2:(j+1)*nlam2])
-                plt.title('Stability Path'); plt.xlabel('$-\log(\lambda)$');
+                plt.title('Stability Path ($\lambda_2 = %0.4f$)' %(self.lam2_arr[j]));
+                plt.xlabel('$-\log(\lambda)$');
                 plt.ylabel('Stability Score')
-                plt.tight_layout(); plt.savefig(file_name)
+                plt.tight_layout();
+                plt.savefig(self.path + 'stability_path%2d' %(j))
 
         #find all the unique PDEs
         tup_sets = set()
 
-        for i in range(len(self.lam)):
+        #scan through all pairs of lam1, lam2
+        for i in range(nlam1*nlam2):
             tup = tuple(np.where(stability[:, i]>=thresh, 1.0, 0.))
             tup_sets.add(tup)
 
         coeffs_all, error_all, num_terms_all, complexity_all = [], [], [], []
 
         for tup in tup_sets:
+
+            #skip if the tuple is empty
+            if tup == set():
+                continue
+                
             #find the new coeffs on full data
             coeffs = np.zeros((n_coeffs, 1))
             NonZeroInds = np.nonzero(np.array(tup))[0]
