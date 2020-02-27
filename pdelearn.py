@@ -190,7 +190,8 @@ class PDElearn:
             logger.error('Since solver is not STRidge, size of lambda2 array must be 1! Exiting..')
             return
 
-        self.lam = lam1_arr #store lambda values to use in stability selection plots
+        self.lam1_arr = lam1_arr #store lambda values to use in stability selection plots
+        self.lam2_arr = lam2_arr
 
         k_fold = RepeatedKFold(n_folds, n_repeats=n_repeats, random_state=random_state)
         tot_folds = k_fold.get_n_splits()
@@ -228,8 +229,10 @@ class PDElearn:
 
             count = 0
             #sweep through hyperparameters and construct a list
-            for lam1 in lam1_arr:
-                for lam2 in lam2_arr:
+            #lam2 has to be in the outer loop because of the way the stability path
+            #is constructed in select_stable_components()
+            for lam2 in lam2_arr:
+                for lam1 in lam1_arr:
                     w_train = find_sparse_coeffs(XTrainStd, yTrainStd, lam1, lam2, maxit)
                     test_error = find_error(XTestStd, yTestStd, w_train)
                     CoeffsList[count][:] = w_train
@@ -360,22 +363,25 @@ class PDElearn:
 
             is_term_present[i] = temp
 
-        stability = np.zeros((n_coeffs, len(self.lam))) #size of the number of lambda, tau pairs
+        nlam1, nlam2 = len(self.lam1_arr), len(self.lam2_arr)
 
-        for i in range(len(self.lam)):
+        stability = np.zeros((n_coeffs, nlam1*nlam2))
+
+        for i in range(nlam1*nlam2):
             sum_ = np.zeros_like(is_term_present[0][0])
             for j in range(n_folds):
                 sum_ += is_term_present[j][i]
             stability[:, i] = sum_/n_folds
 
         if plot_stab:
-            plt.figure(figsize=(5,3), dpi=200)
-            for i in range(n_coeffs):
-                plt.plot(-np.log10(self.lam), stability[i,:])
-            plt.title('Stability Path'); plt.xlabel('$-\log(\lambda)$');
-            plt.ylabel('Stability Score')
-            plt.tight_layout()
-            plt.savefig(self.path + 'stability_path.pdf')
+            #save new plot for each element in lam2_arr
+            for j in range(nlam2):
+                plt.figure(figsize=(5,3), dpi=200)
+                for i in range(n_coeffs):
+                    plt.plot(-np.log10(self.lam1_arr), stability[i,j*nlam2:(j+1)*nlam2])
+                plt.title('Stability Path'); plt.xlabel('$-\log(\lambda)$');
+                plt.ylabel('Stability Score')
+                plt.tight_layout(); plt.savefig(file_name)
 
         #find all the unique PDEs
         tup_sets = set()
