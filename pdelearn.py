@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class PDElearn:
 
     def __init__(self, f_desc, ft_desc, features, data_raw, poly_order=0, sparse_algo='stridge', \
-                    print_flag=False, path='./'):
+                    print_flag=False, path='.'):
         """
         f, ft: string descriptors of the field variable
         features: list with string descriptors of all the features
@@ -297,8 +297,8 @@ class PDElearn:
             plt.bar(np.arange(1,len(score_all)+1), np.sort(score_all)[::-1])
             plt.plot([1, len(score_all)+1], [thresh, thresh], 'r--')
             plt.xlabel('PDE #'); plt.ylabel('Score');
-            plt.tight_layout(); plt.savefig(self.path + 'scores.pdf');
-            logger.info('Score plot saved at %s' %(self.path + 'scores.pdf'))
+            plt.tight_layout(); plt.savefig(self.path + '/scores.pdf');
+            logger.info('Score plot saved at %s' %(self.path + '/scores.pdf'))
 
         #get the coeffs and the errors
         coeffs_all, error_all, num_terms_all, complexity_all = [], [], [], []
@@ -310,8 +310,8 @@ class PDElearn:
 
         for i, (tup, score) in enumerate(zip(tup_sets_all, score_all)):
 
-            #skip if the tuple is empty
-            if tup == set():
+            #check if the PDE has no terms
+            if len(tup) == 0:
                 continue
 
             #find the average test error
@@ -382,12 +382,12 @@ class PDElearn:
             for j in range(nlam2):
                 plt.figure(figsize=(5,3), dpi=200)
                 for i in range(n_coeffs):
-                    plt.plot(-np.log10(self.lam1_arr), stability[i,j*nlam2:(j+1)*nlam2])
+                    plt.plot(-np.log10(self.lam1_arr), stability[i,j*nlam1:(j+1)*nlam1])
                 plt.title('Stability Path ($\lambda_2 = %0.4f$)' %(self.lam2_arr[j]));
                 plt.xlabel('$-\log(\lambda)$');
                 plt.ylabel('Stability Score')
                 plt.tight_layout();
-                plt.savefig(self.path + 'stability_path%2d' %(j))
+                plt.savefig(self.path + '/stability_path%.2d' %(j))
 
         #find all the unique PDEs
         tup_sets = set()
@@ -395,7 +395,10 @@ class PDElearn:
         #scan through all pairs of lam1, lam2
         for i in range(nlam1*nlam2):
             tup = tuple(np.where(stability[:, i]>=thresh, 1.0, 0.))
-            tup_sets.add(tup)
+
+            #add the PDE tuple if non-zero number of terms are above the threshold
+            if len(tup) != 0:
+                tup_sets.add(tup)
 
         coeffs_all, error_all, num_terms_all, complexity_all = [], [], [], []
 
@@ -404,7 +407,7 @@ class PDElearn:
             #skip if the tuple is empty
             if tup == set():
                 continue
-                
+
             #find the new coeffs on full data
             coeffs = np.zeros((n_coeffs, 1))
             NonZeroInds = np.nonzero(np.array(tup))[0]
@@ -459,7 +462,7 @@ class PDElearn:
 
         #find the pareto front
         ParetoInds = find_pareto_front(np.log10(self.errors), self.complexity, \
-                        plot_fig=plot_fig, file_name=self.path + 'pareto.pdf', \
+                        plot_fig=plot_fig, file_name=self.path + '/pareto.pdf', \
                         xlabel='Log(loss)', ylabel='Complexity')
         self.pareto_coeffs = [self.coeffs[i] for i in ParetoInds]
         self.pareto_errors = [self.errors[i] for i in ParetoInds]
@@ -469,7 +472,7 @@ class PDElearn:
         """ Print PDEs corresponding to the list of coeffs and the error
         kwargs: gets in the addtional values to be added to the text file
         """
-        file_name = self.path + 'pdes_' + file_name_end + '.txt'
+        file_name = self.path + '/pdes_' + file_name_end + '.txt'
         with open(file_name, "w") as text_file:
             for i, arr in enumerate(coeffs):
                 print('Log(loss) = %0.6f' %(np.log10(error[i])), file=text_file)
