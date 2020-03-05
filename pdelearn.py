@@ -241,6 +241,8 @@ class PDElearn:
 
             return CoeffsList, ErrorList
 
+            print('*** Done ***')
+
         output = Parallel(n_jobs=n_cores)\
                     (delayed(run_fold)(train_inds_list[i], test_inds_list[i]) \
                     for i in tqdm(range(tot_folds)))
