@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.preprocessing import scale
+from sklearn.preprocessing import StandardScaler
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -26,7 +27,17 @@ def scale_X_y(X,y):
     Scales columns of matrix X to have zero mean and unit variance
     Scales column vector y to have zero mean
     """
-    return scale(X), scale(y, with_std=False)
+
+    #scaledX = scale(X)
+    #scaledy = scale(y, with_std=False)
+
+    scalerX = StandardScaler()
+    scalery = StandardScaler(with_std=False)
+
+    scaledX = scalerX.fit_transform(X)
+    scaledy = scalery.fit_transform(y)
+
+    return scaledX, scaledy
 
 
 def pde_string(w, rhs_description, ut = 'u_t', print_imag=False):
