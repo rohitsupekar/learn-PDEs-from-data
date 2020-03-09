@@ -313,7 +313,7 @@ class PDElearn:
         for i, (tup, score) in enumerate(zip(tup_sets_all, score_all)):
 
             #check if the PDE has no terms
-            if len(tup) == 0:
+            if sum(tup) == 0:
                 continue
 
             #find the average test error
@@ -399,16 +399,12 @@ class PDElearn:
             tup = tuple(np.where(stability[:, i]>=thresh, 1.0, 0.))
 
             #add the PDE tuple if non-zero number of terms are above the threshold
-            if len(tup) != 0:
+            if sum(tup) != 0:
                 tup_sets.add(tup)
 
         coeffs_all, error_all, num_terms_all, complexity_all = [], [], [], []
 
         for tup in tup_sets:
-
-            #skip if the tuple is empty
-            if tup == set():
-                continue
 
             #find the new coeffs on full data
             coeffs = np.zeros((n_coeffs, 1))
@@ -469,6 +465,7 @@ class PDElearn:
         self.pareto_coeffs = [self.coeffs[i] for i in ParetoInds]
         self.pareto_errors = [self.errors[i] for i in ParetoInds]
         self.pareto_scores = [self.scores[i] for i in ParetoInds]
+        self.pareto_complexity = [self.complexity[i] for i in ParetoInds]
 
     def print_pdes(self, coeffs, error, file_name_end='', **kwargs):
         """ Print PDEs corresponding to the list of coeffs and the error
