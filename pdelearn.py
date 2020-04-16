@@ -345,6 +345,7 @@ class PDElearn:
         return coeffs_all, error_all, score_all, num_terms_all, complexity_all
 
     def select_stable_components(self, thresh=0.8, plot_stab=False):
+        ##### TO DO: figure out which order are the pdes stored in? 
         """
         This function calculates the stability score for each term in the dictionary
         for every value of the hyperparamters lambda and tau.
