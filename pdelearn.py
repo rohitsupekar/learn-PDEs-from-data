@@ -345,7 +345,7 @@ class PDElearn:
         return coeffs_all, error_all, score_all, num_terms_all, complexity_all
 
     def select_stable_components(self, thresh=0.8, plot_stab=False):
-        ##### TO DO: figure out which order are the pdes stored in? 
+        ##### TO DO: figure out which order are the pdes stored in?
         """
         This function calculates the stability score for each term in the dictionary
         for every value of the hyperparamters lambda and tau.
@@ -385,10 +385,12 @@ class PDElearn:
             for j in range(nlam2):
                 plt.figure(figsize=(5,3), dpi=200)
                 for i in range(n_coeffs):
-                    plt.plot(-np.log10(self.lam1_arr), stability[i,j*nlam1:(j+1)*nlam1])
+                    plt.plot(-np.log10(self.lam1_arr), stability[i,j*nlam1:(j+1)*nlam1], \
+                            label = '%s' %(self.Theta_desc[i]), alpha=0.6)
                 plt.title('Stability Path ($\lambda_2 = %0.4f$)' %(self.lam2_arr[j]));
-                plt.xlabel('$-\log(\lambda)$');
+                plt.xlabel(r'$-\log(\lambda)$');
                 plt.ylabel('Stability Score')
+                plt.legend(frameon=False, fontsize=3, loc='center left')
                 plt.tight_layout();
                 plt.savefig(self.path + '/stability_path%.2d' %(j))
 
