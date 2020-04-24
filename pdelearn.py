@@ -292,7 +292,12 @@ class PDElearn:
 
         #find q-intersection of the pdes
         q = int(np.floor((1-thresh)*n_folds)) #number of sets to leave out for intersection
-        tup_sets_all, score_all = find_relaxed_intersection(*tup_sets, q=q)
+        tup_sets_, score_ = find_relaxed_intersection(*tup_sets, q=q)
+
+        #sort the tuples and the scores in terms of number of terms
+        n_coeffs_list = [sum(tup) for tup in tup_sets_]
+        tup_sets_all = [x for _, x in sorted(zip(n_coeffs_list, tup_sets_))]
+        score_all = [x for _, x in sorted(zip(n_coeffs_list, score_))]
 
         if plot_hist:
             plt.figure(figsize=(5,3), dpi=200)
@@ -345,7 +350,6 @@ class PDElearn:
         return coeffs_all, error_all, score_all, num_terms_all, complexity_all
 
     def select_stable_components(self, thresh=0.8, plot_stab=False):
-        ##### TO DO: figure out which order are the pdes stored in?
         """
         This function calculates the stability score for each term in the dictionary
         for every value of the hyperparamters lambda and tau.
@@ -407,7 +411,12 @@ class PDElearn:
 
         coeffs_all, error_all, num_terms_all, complexity_all = [], [], [], []
 
-        for tup in tup_sets:
+        #convert the set of tuples to a list and sort according to number of terms
+        tups_list = list(tup_sets)
+        n_coeffs_list = [sum(tup) for tup in tups_list]
+        tups_list_sorted = [x for _, x in sorted(zip(n_coeffs_list, tups_list))]
+
+        for tup in tups_list_sorted:
 
             #find the new coeffs on full data
             coeffs = np.zeros((n_coeffs, 1))
