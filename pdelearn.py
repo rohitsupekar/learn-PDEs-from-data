@@ -176,7 +176,7 @@ class PDElearn:
         return find_sparse_coeffs
 
     def run_cross_validation(self, lam1_arr, lam2_arr, n_cores=1, n_folds=4, \
-        n_repeats=1, random_state=None, maxit=1000):
+        n_repeats=1, random_state=None, maxit=1000, plot_folds=False):
         """
         Performs cross_validation
         lam1_arr: array with values for tau for STRidge and lambda for LASSO and IHTd
@@ -195,9 +195,6 @@ class PDElearn:
 
         k_fold = RepeatedKFold(n_folds, n_repeats=n_repeats, random_state=random_state)
         tot_folds = k_fold.get_n_splits()
-
-        coeffs_folds = [None]*tot_folds
-        test_error_folds = [None]*tot_folds
 
         n, d = self.Theta.shape
 
@@ -249,6 +246,22 @@ class PDElearn:
 
         self.coeffs_folds = [i[0] for i in output]
         self.error_folds = [i[1] for i in output]
+
+        #plot the error and complexity of all the PDEs in each fold
+        if plot_folds:
+            for k, lst in enumerate(self.coeffs_folds):
+                fig = plt.figure(figsize=(5,3))
+                for i, arr in enumerate(lst):
+                    tup = tuple(np.where(arr[:,0]==0., 0., 1.))
+                    complexity = np.sum(self.W @ (np.array(tup)[:, np.newaxis]))
+                    error = self.error_folds[k][i]
+                    plt.scatter(np.log10(error), complexity, 10, 'k')
+                plt.xlabel(r'$\log(Loss)$')
+                plt.ylabel('Complexity')
+                plt.title('Fold %i' %(k))
+                plt.tight_layout()
+                plt.savefig('%s/fold_%i.pdf' %(self.path, k))
+                plt.close(fig)
 
         logger.info('Cross Validation done!')
 
@@ -389,14 +402,14 @@ class PDElearn:
             for j in range(nlam2):
                 plt.figure(figsize=(5,3), dpi=200)
                 for i in range(n_coeffs):
-                    plt.plot(-np.log10(self.lam1_arr), stability[i,j*nlam1:(j+1)*nlam1], \
+                    plt.plot(-np.log10(self.lam1_arr/np.max(self.lam1_arr)), stability[i,j*nlam1:(j+1)*nlam1], \
                             label = '%s' %(self.Theta_desc[i]), alpha=0.6)
                 plt.title('Stability Path ($\lambda_2 = %0.4f$)' %(self.lam2_arr[j]));
-                plt.xlabel(r'$-\log(\lambda)$');
+                plt.xlabel(r'$-\log(\lambda/\lambda_{max})$');
                 plt.ylabel('Stability Score')
-                plt.legend(frameon=False, fontsize=3, loc='center left')
+                plt.legend(frameon=False, fontsize=3, loc='center left', bbox_to_anchor=(1, 0.5))
                 plt.tight_layout();
-                plt.savefig(self.path + '/stability_path%.2d' %(j))
+                plt.savefig(self.path + '/stability_path%.2d.pdf' %(j))
 
         #find all the unique PDEs
         tup_sets = set()
