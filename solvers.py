@@ -58,7 +58,7 @@ def STRidge(X, y, lam, tol, maxit=1000, W=None, standardize = False, print_flag 
         if num_relevant == len(biginds):
             if print_flag:
                 print("breaking")
-                break
+            break
         else:
             num_relevant = len(biginds)
 
