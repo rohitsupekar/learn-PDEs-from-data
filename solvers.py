@@ -41,7 +41,7 @@ def STRidge(X, y, lam, tol, maxit=1000, W=None, standardize = False, print_flag 
         thresh_nonzero = np.ones((d,1))
 
     # Get the standard ridge esitmate
-    w = np.linalg.lstsq(X_std.T@X_std + lam*np.diag(W)@np.diag(W), X_std.T@y_std, rcond=None)[0]
+    w = np.linalg.lstsq(X_std.T@X_std + lam*np.diag(W)@np.diag(W), X_std.T@y_std, rcond=-1)[0]
     num_relevant = d
 
     # Thresholding loop
@@ -73,11 +73,11 @@ def STRidge(X, y, lam, tol, maxit=1000, W=None, standardize = False, print_flag 
 
         # New guess
         w[smallinds] = 0
-        w[biginds] = np.linalg.lstsq(X_std[:, biginds].T@X_std[:, biginds] + lam*np.diag(W[biginds])@np.diag(W[biginds]),X_std[:, biginds].T@y_std, rcond=None)[0]
+        w[biginds] = np.linalg.lstsq(X_std[:, biginds].T@X_std[:, biginds] + lam*np.diag(W[biginds])@np.diag(W[biginds]),X_std[:, biginds].T@y_std, rcond=-1)[0]
 
 
     # Now that we have the sparsity pattern, use standard least squares to get w
-    if biginds != []: w[biginds] = np.linalg.lstsq(X[:, biginds],y, rcond=None)[0]
+    if biginds != []: w[biginds] = np.linalg.lstsq(X[:, biginds],y, rcond=-1)[0]
 
     return w
 
