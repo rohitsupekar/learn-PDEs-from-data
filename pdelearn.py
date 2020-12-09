@@ -343,7 +343,7 @@ class PDElearn:
             coeffs_new = np.zeros((d,1))
             #refit coefficients only if some are non-zero
             if len(NonZeroInds) != 0:
-                coeffs_new[NonZeroInds] = np.linalg.lstsq(self.Theta[:, NonZeroInds], self.ft, rcond=None)[0]
+                coeffs_new[NonZeroInds] = np.linalg.lstsq(self.Theta[:, NonZeroInds], self.ft, rcond=-1)[0]
 
             num_terms = np.sum(np.array(tup))
             complexity = np.sum(self.W @ (np.array(tup)[:, np.newaxis]))
@@ -436,7 +436,7 @@ class PDElearn:
             NonZeroInds = np.nonzero(np.array(tup))[0]
             #refit coefficients only if some are non-zero
             if len(NonZeroInds) != 0:
-                coeffs[NonZeroInds] = np.linalg.lstsq(self.Theta[:, NonZeroInds], self.ft, rcond=None)[0]
+                coeffs[NonZeroInds] = np.linalg.lstsq(self.Theta[:, NonZeroInds], self.ft, rcond=-1)[0]
             sq_error = find_error(self.Theta, self.ft, coeffs)
 
             num_terms = np.sum(np.array(tup))
