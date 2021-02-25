@@ -25,7 +25,9 @@ We use `joblib` for parallelization and `sklearn` for cross-validation-specific 
 ## Implementations 
 
 `pdel.pdelearn` has the core framework of generating library functions, cross-validation, and stability selection. 
+
 `pdel.funcs` provides helper functions. 
+
 `pdel.solvers` provides solvers for sparse regression. 
 
 ## Example
