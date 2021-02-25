@@ -26,7 +26,7 @@ class PDElearn:
         data_raw: dictioary of data for each descriptor in features
         poly_order: largest order of f to construct the feature matrix
         sparse_algo: which sparsity promoting algo to use
-            currently implemented 'STRidge', 'IHTd'
+            currently implemented 'STRidge'
         path: various text/pdf files will be saved at path + qualifier . extension
         """
         self.ft_desc = ft_desc
@@ -36,7 +36,7 @@ class PDElearn:
         self.print_flag = print_flag
         self.path = path
 
-        if sparse_algo.lower() not in ['stridge', 'ihtd']:
+        if sparse_algo.lower() not in ['stridge']:
             self.sparse_algo = 'stridge' #default
         else:
             self.sparse_algo = sparse_algo.lower()
