@@ -15,6 +15,8 @@ conda activate pdel
 pip3 install -r requirements.txt
 ```
 
+We use `joblib` for parallelization and `sklearn` for cross-validation-specific needs. 
+
 # Implementations 
 
 `pdel.pdelearn` has the core framework of generating library functions, cross-validation, and stability selection. 
