@@ -20,3 +20,7 @@ pip3 install -r requirements.txt
 `pdel.pdelearn` has the core framework of generating library functions, cross-validation, and stability selection. 
 `pdel.funcs` provides helper functions. 
 `pdel.solvers` provides solvers for sparse regression. 
+
+# Example
+
+Please check `example.ipynb` which describes using the module on simulated data from the Fisher-KPP equations. 
