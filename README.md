@@ -5,6 +5,8 @@ In this repo, I have implemented recently proposed methods in sparse regression(
 The goal of these methods is to infer ordinary/partial differential equations from time-series measurement data. 
 
 # Install the dependencies:
+First clone the repo and navigate the code directory. 
+
 (Using conda) Create a new environment
 ```
 conda env create --name pdel --file=environment.yml
