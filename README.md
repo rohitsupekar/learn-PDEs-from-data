@@ -8,7 +8,7 @@ The goal of these methods is to infer ordinary/partial differential equations fr
 <img src="schematic.png" align="center" width="650">
 
 ## Install the dependencies:
-First clone the repo and navigate to the code directory. 
+If you would like to use the code locally, clone the repo and navigate to the code directory. 
 
 (Using conda) Create a new environment
 ```
