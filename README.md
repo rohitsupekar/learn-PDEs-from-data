@@ -5,7 +5,7 @@ In this repo, I have implemented the `pdel` (short for PDE learning) module base
 The goal of these methods is to infer ordinary/partial differential equations from time-series measurement data. 
 
 
-<img src="schematic.png" align="center" width="800">
+<img src="schematic.png" align="center" width="650">
 
 # Install the dependencies:
 First clone the repo and navigate to the code directory. 
