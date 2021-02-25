@@ -1,12 +1,11 @@
 """
 Contains sparsity promoting solvers
 1. STRidge
-2. IHTd
-3. LASSO (to be implemented)
 """
 from sklearn import preprocessing
 import numpy as np
 
+#adapted with some changes from https://github.com/snagcliffs/PDE-FIND
 def STRidge(X, y, lam, tol, maxit=1000, W=None, standardize = False, print_flag = False, \
             thresh_nonzero = None):
     """
@@ -80,72 +79,3 @@ def STRidge(X, y, lam, tol, maxit=1000, W=None, standardize = False, print_flag 
     if biginds != []: w[biginds] = np.linalg.lstsq(X[:, biginds],y, rcond=-1)[0]
 
     return w
-
-
-def IHTd(X, y, lasso_lam, max_iter, sub_iter, tol, htp_flag, print_flag=False):
-    n,d = X.shape
-    coeff_old  = np.zeros((d,1))
-    coeff_new  = np.zeros((d,1))
-    L = 1.0
-    LL = np.linalg.norm(X.T.dot(X),2)
-    one  =  (1./L)*(X.T.dot(y))
-    XTX  = X.T.dot(X)
-
-    coeff_old =  one #+ 0.01*np.random.normal(0, 1, d)
-    support =  np.arange(0,d)
-    frac_iter = 0
-    time_step = (1.0/LL)
-    for iteration in range(0, max_iter):
-        if print_flag:
-            print('iter = %i' %(iteration))
-        temp = np.zeros((d,1))
-        if(htp_flag == 1):
-            temp = coeff_old + (2.0/LL) *(one  - XTX.dot(coeff_old)) #inclusion will make similar algorithm to HTP
-        else:
-            temp = coeff_old.copy()
-
-        smallinds   = np.where( abs(temp) <= lasso_lam/(L))[0]
-        biginds     = [i for i in range(d) if i not in smallinds]
-        if( len(biginds) == 0 ):  # if( len(biginds)==0 and iteration !=0 ):
-            coeff_new[:] = 0
-            return coeff_new
-        else:
-            #temp    = np.zeros((1,d)) # added this
-            temper  = np.zeros((len(biginds), 1))
-            grad    = np.zeros((len(biginds),1))
-            grad_A  = np.zeros((n,1))
-            LLL     = np.linalg.norm(X[:, biginds].T.dot(X[:, biginds]), 2)
-            XTy_s   = X[:, biginds].T.dot(y)
-            XTX_s   = X[:, biginds].T.dot( X[:, biginds])
-            for k in range(0, sub_iter):
-                temp_2      = XTX_s.dot( temp[biginds,:] )
-                grad        = (XTy_s - temp_2)
-                grad_A      = X[:, biginds].dot(grad)
-                if(grad.T.dot(grad) == 0):
-                    break
-                else:
-                    time_step = (grad.T.dot(grad))/(grad_A.T.dot(grad_A))
-
-                temper = temp[biginds] + (time_step)*grad
-                if( np.linalg.norm( y - X[:, biginds].dot(temper), 2)**2 < (len(biginds)*lasso_lam) ):
-                    coeff_new[biginds]   = temper.copy()
-                    coeff_new[smallinds] = 0
-                    frac_iter = frac_iter + 1
-                    break
-
-                temp[biginds]   = temper.copy() # copy to old
-
-            coeff_new[biginds]   = temper.copy() # new coeffs value
-            coeff_new[smallinds] = 0                  # new coeffs value
-
-        # check for convergence
-        if( (np.linalg.norm(coeff_new - coeff_old, np.inf) < tol) and np.all(support == biginds) ):
-            if(print_flag):
-                print(" converged at iteration ", iteration,  " frac_iter ", frac_iter/(iteration+1), " flag ", htp_flag)
-            return coeff_new
-
-        # copy the values between old and new
-        support = biginds.copy()
-        coeff_old = coeff_new.copy()
-
-    return coeff_new #return a column vector
