@@ -1,3 +1,22 @@
 # Learning PDEs from data 
 
-In this repo, I have implemented recently proposed methods in sparse regression([Brunton _et al. 2016](https://www.pnas.org/content/113/15/3932)) and stability selection to learn dynamical equations from data. 
+In this repo, I have implemented recently proposed methods in sparse regression([Brunton et al., 2016](https://www.pnas.org/content/113/15/3932), [Rudy et al., 2017](https://advances.sciencemag.org/content/3/4/e1602614)) and stability selection ([Maddu et al., 2019](https://arxiv.org/abs/1907.07810)) to learn dynamical equations from data.
+
+The goal of these methods is to infer ordinary/partial differential equations from time-series data of measurements at different spatial locations. 
+
+# Install the dependencies:
+(Using conda) Create a new environment
+```
+conda env create --name pdel --file=environment.yml
+conda activate pdel
+```
+(Using pip) 
+```
+pip3 install -r requirements.txt
+```
+
+# Implementations 
+
+`pdel.pdelearn` has the core framework of generating library functions, cross-validation, and stability selection. 
+`pdel.funcs` provides helper functions. 
+`pdel.solvers` provides solvers for sparse regression. 
