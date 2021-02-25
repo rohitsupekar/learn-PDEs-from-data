@@ -165,9 +165,6 @@ class PDElearn:
         if self.sparse_algo == 'stridge':
             find_sparse_coeffs = lambda X, y, lam1, lam2, maxit: \
                 STRidge(X, y, lam2, lam1, maxit, W=W, thresh_nonzero=thresh_nonzero, print_flag = self.print_flag)
-        elif self.sparse_algo == 'ihtd':
-            find_sparse_coeffs = lambda X, y, lam1, lam2, maxit: \
-                IHTd(X, y, lam1, maxit, 100, 10**-10, htp_flag=1, print_flag = self.print_flag)
         else:
             pass #implement lasso
 
