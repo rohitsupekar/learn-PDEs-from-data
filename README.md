@@ -1,4 +1,4 @@
-# Learning PDEs from data 
+## Learning PDEs from data 
 
 In this repo, I have implemented the `pdel` (short for PDE learning) module based on recently proposed methods in sparse regression([Brunton et al., 2016](https://www.pnas.org/content/113/15/3932), [Rudy et al., 2017](https://advances.sciencemag.org/content/3/4/e1602614)) and stability selection ([Maddu et al., 2019](https://arxiv.org/abs/1907.07810)) to learn dynamical equations from data.
 
@@ -7,7 +7,7 @@ The goal of these methods is to infer ordinary/partial differential equations fr
 
 <img src="schematic.png" align="center" width="650">
 
-# Install the dependencies:
+## Install the dependencies:
 First clone the repo and navigate to the code directory. 
 
 (Using conda) Create a new environment
@@ -22,12 +22,12 @@ pip3 install -r requirements.txt
 
 We use `joblib` for parallelization and `sklearn` for cross-validation-specific needs. 
 
-# Implementations 
+## Implementations 
 
 `pdel.pdelearn` has the core framework of generating library functions, cross-validation, and stability selection. 
 `pdel.funcs` provides helper functions. 
 `pdel.solvers` provides solvers for sparse regression. 
 
-# Example
+## Example
 
 Please check `example.ipynb` which describes using the module on simulated data from the Fisher-KPP equations. 
