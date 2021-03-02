@@ -7,8 +7,14 @@ The goal of these methods is to infer ordinary/partial differential equations fr
 
 <img src="schematic.png" align="center" width="650">
 
+If you would like to use the code locally, clone the repo and navigate to the code directory.
+
+```
+git clone https://github.com/rohitsupekar/learn-PDEs-from-data
+cd learn-PDEs-from-data
+```
+
 ## Install the dependencies:
-If you would like to use the code locally, clone the repo and navigate to the code directory. 
 
 (Using conda) Create a new environment
 ```
