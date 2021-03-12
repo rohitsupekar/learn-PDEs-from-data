@@ -39,3 +39,7 @@ We use `joblib` for parallelization and `sklearn` for cross-validation-specific 
 ## Example
 
 Please check `example.ipynb` which describes using the module on simulated data from the Fisher-KPP equations. 
+
+### Credits
+
+Thanks to D. Skinner for providing the simulated data. 
